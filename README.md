@@ -2,6 +2,10 @@
 ---
 This repository contains the projects and implementations I will develop throughout the Telematic Services course as part of my Computer Engineering degree at UAO.
 
+## Test
+
+The nth test will be uploaded to the branch `test-0n`.
+
 ## Commits
 
 The `main` branch will include all implementations made during the semester. Each commit will follow this format:
