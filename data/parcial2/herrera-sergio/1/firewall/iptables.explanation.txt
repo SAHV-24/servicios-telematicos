@@ -1,0 +1,15 @@
+El iptables es el servicio primario de firewall de Linux, en este caso, fue utilizado para permitir el FORWARDING hacía la ip 192.168.50.4
+
+
+Esto se logra al ejecutar los siguientes comandos 
+
+
+`
+sudo iptables -t nat -A PREROUTING -p udp --dport 53 -j DNAT --to-destination 192.168.50.3:53
+sudo iptables -t nat -A PREROUTING -p tcp --dport 53 -j DNAT --to-destination 192.168.50.3:53
+sudo iptables -A FORWARD -p udp --dport 53 -d 192.168.50.3 -j ACCEPT
+sudo iptables -A FORWARD -p tcp --dport 53 -d 192.168.50.3 -j ACCEPT
+sudo iptables -t nat -A POSTROUTING -p udp --dport 53 -d 192.168.50.3 -j MASQUERADE
+sudo iptables -t nat -A POSTROUTING -p tcp --dport 53 -d 192.168.50.3 -j MASQUERADE
+	
+`

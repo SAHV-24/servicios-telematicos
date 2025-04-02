@@ -1,0 +1,26 @@
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+key "clave-tsig" {
+        algorithm hmac-md5;
+        secret "7di+iJyjIpTByIFJp7h8WA==";
+};
+
+server 192.168.50.3 {
+	keys { "clave-tsig"};	
+};
+
+zone "empresa.local" {
+	type slave;
+	masters {192.168.50.3; };
+	file "/var/cache/bind/db.empresa.slave";
+};
+
+zone "50.168.192.in-addr.arpa" {
+	type slave;
+	masters {192.168.50.3; };
+	file "/var/cache/bind/db.empresa.reverse.slave";
+};
+
+

@@ -1,8 +1,19 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
 Vagrant.configure("2") do |config| 
 
+  # Servidor Firewall:
+  config.vm.define :servidorFirewall do |servidorFirewall| 
+    servidorFirewall.vm.box = "firewallParcial" 
+    servidorFirewall.vm.network :private_network, ip: "192.168.90.3" 
+    servidorFirewall.vm.hostname = "servidorFirewall" 
+  end 
+
+  # Cliente Firewall:
+  config.vm.define :clienteFirewall do |clienteFirewall| 
+    clienteFirewall.vm.box = "bento/ubuntu-22.04" 
+    clienteFirewall.vm.network :private_network, ip: "192.168.90.2" 
+    clienteFirewall.vm.hostname = "clienteFirewall" 
+  end 
+  
   # Servidores:
   config.vm.define :servidor do |servidor| 
     servidor.vm.box = "bento/ubuntu-22.04" 
@@ -27,5 +38,12 @@ Vagrant.configure("2") do |config|
     cliente.vm.synced_folder "./data", "/vagrant"
   end 
 
+    # Firewall(FrontEnd):
+  config.vm.define :frontEnd do |frontEnd| 
+    frontEnd.vm.box = "bento/ubuntu-22.04" 
+    frontEnd.vm.network :private_network, ip: "192.168.50.5" 
+    frontEnd.vm.hostname = "frontEnd" 
+    frontEnd.vm.synced_folder "./data", "/vagrant"
+  end 
+    
 end 
-  

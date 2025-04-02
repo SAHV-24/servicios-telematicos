@@ -1,0 +1,17 @@
+Status: active
+
+To                         Action      From
+--                         ------      ----
+Anywhere                   DENY        192.168.50.0/24           
+Anywhere                   DENY        192.168.90.1              
+Anywhere                   ALLOW       192.168.90.0/24           
+21/tcp                     ALLOW       192.168.90.0/24           
+20/tcp                     ALLOW       192.168.90.0/24           
+990/tcp                    ALLOW       192.168.90.0/24           
+80/tcp                     ALLOW       192.168.90.2              
+443/tcp                    ALLOW       192.168.90.2              
+53/tcp                     ALLOW       192.168.90.2              
+53/udp                     ALLOW       192.168.90.2              
+22/tcp                     ALLOW       Anywhere                  
+22/tcp (v6)                ALLOW       Anywhere (v6)             
+
