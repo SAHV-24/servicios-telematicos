@@ -1,49 +1,29 @@
 Vagrant.configure("2") do |config| 
+  config.vm.box = "bento/ubuntu-20.04"
+  config.vm.synced_folder "data/", "/vagrant"
 
-  # Servidor Firewall:
-  config.vm.define :servidorFirewall do |servidorFirewall| 
-    servidorFirewall.vm.box = "firewallParcial" 
-    servidorFirewall.vm.network :private_network, ip: "192.168.90.3" 
-    servidorFirewall.vm.hostname = "servidorFirewall" 
-  end 
 
-  # Cliente Firewall:
-  config.vm.define :clienteFirewall do |clienteFirewall| 
-    clienteFirewall.vm.box = "bento/ubuntu-22.04" 
-    clienteFirewall.vm.network :private_network, ip: "192.168.90.2" 
-    clienteFirewall.vm.hostname = "clienteFirewall" 
-  end 
-  
-  # Servidores:
-  config.vm.define :servidor do |servidor| 
-    servidor.vm.box = "bento/ubuntu-22.04" 
-    servidor.vm.network "private_network", ip: "192.168.50.3"
-    servidor.vm.hostname = "servidor"
-    servidor.vm.synced_folder './data', "/vagrant"
+  config.vm.define :loadBalancer do |loadBalancer| 
+    loadBalancer.vm.network :private_network, ip: "192.168.90.2" 
+    loadBalancer.vm.hostname = "loadBalancer"
   end 
 
-  config.vm.define :servidorDos do |servidorDos| 
-    #Se refiere a la box del servidor que se configuró durante el semestre (server con HTTP y DNS) 
-    servidorDos.vm.box = "http-box" 
-    servidorDos.vm.network "private_network", ip: "192.168.50.4"
-    servidorDos.vm.hostname = "servidorDos"
-    servidorDos.vm.synced_folder './data', "/vagrant"
-  end 
+  config.vm.define :maestro do |maestro|
+    maestro.vm.network :private_network, ip: "192.168.90.3"
+    maestro.vm.provision "shell", path: "provision/provision_mysql.sh"
+  end   
 
-  # Cliente:
-  config.vm.define :cliente do |cliente| 
-    cliente.vm.box = "bento/ubuntu-22.04" 
-    cliente.vm.network :private_network, ip: "192.168.50.2" 
-    cliente.vm.hostname = "cliente" 
-    cliente.vm.synced_folder "./data", "/vagrant"
-  end 
+  config.vm.define :esclavoUno do |esclavoUno|
+    esclavoUno.vm.network :private_network, ip: "192.168.90.4"
+    esclavoUno.vm.hostname = "esclavoUno"
+  end   
 
-    # Firewall(FrontEnd):
-  config.vm.define :frontEnd do |frontEnd| 
-    frontEnd.vm.box = "bento/ubuntu-22.04" 
-    frontEnd.vm.network :private_network, ip: "192.168.50.5" 
-    frontEnd.vm.hostname = "frontEnd" 
-    frontEnd.vm.synced_folder "./data", "/vagrant"
-  end 
-    
+  config.vm.define :esclavoDos do |esclavoDos|
+    esclavoDos.vm.network :private_network, ip: "192.168.90.5"
+    esclavoDos.vm.hostname = "esclavoDos"
+    esclavoDos.vm.provider "virtualbox" do |vb|
+      vb.memory = 4096
+      vb.cpus = 4
+    end
+  end   
 end 
