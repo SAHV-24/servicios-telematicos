@@ -79,12 +79,14 @@ function createUser() {
         return response.json();
     })
     .then(data => {
-        // Handle success
-        console.log(data);
+        // Mostrar alerta y recargar la página para ver los cambios
+        alert('Usuario creado exitosamente');
+        window.location.reload();
     })
     .catch(error => {
         // Handle error
         console.error('Error:', error);
+        alert('Error al crear el usuario');
     });
 }
 
