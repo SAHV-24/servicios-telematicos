@@ -1,0 +1,67 @@
+name: CI/CD Flask Docker AWS
+
+on:
+  push:
+    branches: [ main, pruebas ]
+  pull_request:
+    branches: [ main, pruebas ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install HTTPie for API testing
+        run: pip install httpie
+
+      - name: Start Docker Compose (detached)
+        run: docker-compose up -d --build
+
+      - name: Esperar a que Flask esté listo
+        run: |
+          for i in {1..20}; do
+            if http --verify=no --check-status GET https://localhost/api/users; then
+              echo 'API disponible'; exit 0;
+            else
+              echo 'Esperando API...'; sleep 5;
+            fi
+          done
+          echo 'La API no respondió a tiempo'; exit 1
+
+      - name: Probar endpoint GET /api/users
+        run: http --verify=no GET https://localhost/api/users
+
+      - name: Probar endpoint POST /api/users
+        run: |
+          http --verify=no POST https://localhost/api/users name=TestUser email=test@example.com username=testuser password=123456
+
+      - name: Docker Compose Down
+        run: docker-compose down
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Copiar archivos a la VM
+        run: |
+          rsync -avz --exclude='.git' -e 'ssh -o StrictHostKeyChecking=no' ./ ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:~/PUNTO1/
+
+      - name: Desplegar en la VM
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} 'cd ~/PUNTO1 && docker-compose down && docker-compose up --build -d'
